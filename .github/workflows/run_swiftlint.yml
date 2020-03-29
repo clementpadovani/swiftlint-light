@@ -15,3 +15,6 @@ jobs:
     runs:
       using: 'docker'
       image: 'Dockerfile'
+
+    steps:
+       name: "Foo"

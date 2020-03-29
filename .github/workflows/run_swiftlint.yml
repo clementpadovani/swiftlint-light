@@ -1,0 +1,17 @@
+name: Run SwiftLint
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    runs:
+  using: 'docker'
+  image: 'Dockerfile'

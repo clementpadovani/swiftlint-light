@@ -8,5 +8,8 @@ RUN swift build --configuration release --static-swift-stdlib && \
 
 FROM scratch
 LABEL maintainer "Clement Padovani <clement.padovani@gmail.com>"
-COPY --from=builder swiftlint /usr/local/bin/swiftlint
+COPY --from=builder swiftlint swiftlint
+# RUN ls -an
+# RUN pwd
+# RUN swiftlint version
 CMD ["swiftlint", "lint"]

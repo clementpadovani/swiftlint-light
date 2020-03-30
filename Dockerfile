@@ -6,7 +6,7 @@ WORKDIR SwiftLint
 RUN swift build --configuration release --static-swift-stdlib && \
     cp ./.build/release/swiftlint /swiftlint
 
-FROM alpine:latest
+FROM scratch
 LABEL maintainer "Clement Padovani <clement.padovani@gmail.com>"
 COPY --from=builder swiftlint /usr/local/bin/swiftlint
 CMD ["swiftlint", "lint"]

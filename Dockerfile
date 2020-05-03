@@ -1,15 +1,19 @@
-FROM swift:5.2 as builder
-LABEL maintainer "Clement Padovani <clement.padovani@gmail.com>"
+FROM alpine/git:latest AS cloner
 ENV SWIFTLINT_REVISION="master"
+WORKDIR /swiftlint
 RUN git clone --branch $SWIFTLINT_REVISION https://github.com/realm/SwiftLint.git
-WORKDIR SwiftLint
-RUN swift build --configuration release --static-swift-stdlib && \
-    cp ./.build/release/swiftlint /swiftlint
 
-FROM scratch
+FROM swift:5.2 AS builder
 LABEL maintainer "Clement Padovani <clement.padovani@gmail.com>"
-COPY --from=builder swiftlint swiftlint
-# RUN ls -an
-# RUN pwd
-# RUN swiftlint version
-CMD ["swiftlint", "lint"]
+COPY --from=cloner /swiftlint/ /
+RUN cd SwiftLint && \
+    swift build --configuration release --static-swift-stdlib && \
+    swift build --configuration release --static-swift-stdlib --show-bin-path    
+RUN cd SwiftLint && \
+    mv `swift build --configuration release --static-swift-stdlib --show-bin-path`/swiftlint /swiftlint
+
+FROM swift:5.2-slim
+LABEL maintainer "Clement Padovani <clement.padovani@gmail.com>"
+COPY --from=builder /swiftlint /
+RUN ./swiftlint version
+CMD ["./swiftlint", "lint"]

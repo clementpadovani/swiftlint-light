@@ -15,5 +15,6 @@ RUN cd SwiftLint && \
 FROM swift:5.2-slim
 LABEL maintainer "Clement Padovani <clement.padovani@gmail.com>"
 COPY --from=builder /swiftlint /bin/swiftlint
+COPY --from=builder /usr/lib/libsourcekitdInProc.so /usr/lib/libsourcekitdInProc.so
 RUN swiftlint version
 CMD ["swiftlint", "lint"]

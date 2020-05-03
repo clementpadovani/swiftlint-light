@@ -14,6 +14,6 @@ RUN cd SwiftLint && \
 
 FROM swift:5.2-slim
 LABEL maintainer "Clement Padovani <clement.padovani@gmail.com>"
-COPY --from=builder /swiftlint /
-RUN ./swiftlint version
-CMD ["./swiftlint", "lint"]
+COPY --from=builder /swiftlint /bin/swiftlint
+RUN swiftlint version
+CMD ["swiftlint", "lint"]

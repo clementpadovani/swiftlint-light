@@ -1,5 +1,4 @@
 ARG SWIFT_VERSION=5.4
-
 ARG SWIFT_UBUNTU_RELEASE=bionic
 
 FROM alpine/git:latest AS cloner
@@ -9,20 +8,16 @@ RUN git clone --branch $SWIFTLINT_REVISION https://github.com/realm/SwiftLint.gi
 
 FROM swift:${SWIFT_VERSION}-${SWIFT_UBUNTU_RELEASE} AS builder
 LABEL maintainer "Clement Padovani <clement.padovani@gmail.com>"
-
 RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libxml2-dev && \
     rm -r /var/lib/apt/lists/*
-
 COPY --from=cloner /swiftlint/ /
-
 RUN cd SwiftLint && \
     swift build --static-swift-stdlib -Xlinker -lCFURLSessionInterface -Xlinker -lcurl --configuration release --build-path /build/.build
 
-FROM swift:5.2-slim
+FROM swift:${SWIFT_VERSION}-${SWIFT_UBUNTU_RELEASE}-slim
 LABEL maintainer "Clement Padovani <clement.padovani@gmail.com>"
-COPY --from=builder /swiftlint /bin/swiftlint
-COPY --from=builder /usr/lib/libsourcekitdInProc.so /usr/lib/libsourcekitdInProc.so
-RUN swiftlint version
-CMD ["swiftlint", "lint"]
+COPY --from=builder /usr/lib/libsourcekitdInProc.so /usr/lib
+COPY --from=builder /build/.build/release/swiftlint /usr/bin
+ENTRYPOINT ["swiftlint"]

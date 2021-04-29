@@ -1,16 +1,24 @@
+ARG SWIFT_VERSION=5.4
+
+ARG SWIFT_UBUNTU_RELEASE=bionic
+
 FROM alpine/git:latest AS cloner
 ENV SWIFTLINT_REVISION="master"
 WORKDIR /swiftlint
 RUN git clone --branch $SWIFTLINT_REVISION https://github.com/realm/SwiftLint.git
 
-FROM swift:5.2 AS builder
+FROM swift:${SWIFT_VERSION}-${SWIFT_UBUNTU_RELEASE} AS builder
 LABEL maintainer "Clement Padovani <clement.padovani@gmail.com>"
+
+RUN apt-get update && apt-get install -y \
+    libcurl4-openssl-dev \
+    libxml2-dev && \
+    rm -r /var/lib/apt/lists/*
+
 COPY --from=cloner /swiftlint/ /
+
 RUN cd SwiftLint && \
-    swift build --configuration release --static-swift-stdlib && \
-    swift build --configuration release --static-swift-stdlib --show-bin-path    
-RUN cd SwiftLint && \
-    mv `swift build --configuration release --static-swift-stdlib --show-bin-path`/swiftlint /swiftlint
+    swift build --static-swift-stdlib -Xlinker -lCFURLSessionInterface -Xlinker -lcurl --configuration release --build-path /build/.build
 
 FROM swift:5.2-slim
 LABEL maintainer "Clement Padovani <clement.padovani@gmail.com>"

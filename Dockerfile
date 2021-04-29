@@ -26,4 +26,5 @@ COPY --from=builder /usr/lib/libsourcekitdInProc.so /usr/lib
 COPY --from=builder /usr/lib/swift/linux/libBlocksRuntime.so /usr/lib
 COPY --from=builder /usr/lib/swift/linux/libdispatch.so /usr/lib
 COPY --from=builder /build/.build/release/swiftlint /usr/bin
-ENTRYPOINT ["swiftlint"]
+
+CMD ["swiftlint", "lint"]
